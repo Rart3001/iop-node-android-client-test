@@ -1,9 +1,20 @@
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
+version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
 }
 
 dependencies {
@@ -21,5 +32,25 @@ dependencies {
 
     compile ('org.glassfish.tyrus.bundles:tyrus-standalone-client:1.12'){
         exclude group:'javax.websocket', module:'javax.websocket-api'
+    }
+}
+
+shadowJar {
+    archiveName = project.name + '-production-' + version  + ".jar"
+    mergeServiceFiles()
+    manifest {
+        attributes 'Built-Date': new Date()
+        attributes 'Built-By': System.getProperty('user.name')
+        attributes 'Build-Jdk': System.getProperty('java.version')
+        attributes 'Implementation-Title': project.name
+        attributes 'Implementation-Version': project.version
+        attributes 'Implementation-Vendor-Id': project.group
+    }
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.iop.stress_app.Main'
     }
 }
